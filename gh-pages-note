@@ -1,0 +1,39 @@
+#! /bin/bash
+
+if [ -z "$JEKYLL_SITE_DIR" ] || [ -z "$JEKYLL_EDITOR" ]
+then
+	echo "You must set JEKYLL_SITE_DIR and JEKYLL_EDITOR before using this"
+	exit 1
+fi
+
+read -p "Enter note category: " CATEGORY
+
+if [ -z "$CATEGORY" ]
+then
+	echo "You must set a category"
+	exit 1
+fi
+
+read -p "Enter title of the note: " TITLE
+
+POSTDIR="$JEKYLL_SITE_DIR/notes/$CATEGORY/_posts"
+
+FNAME_DATE=$(date "+%Y-%m-%d")
+FNAME_POST_TITLE=`echo $TITLE | tr ' ' "-"`
+FNAME="$POSTDIR/$FNAME_DATE-$FNAME_POST_TITLE.md"
+
+YAML_DATE=$(date "+%B %d %Y %H:%M")
+
+touch "$FNAME"
+
+echo "---" >> $FNAME
+echo "title: $TITLE" >> $FNAME
+echo "date: $YAML_DATE" >> $FNAME
+echo "layout: note" >> $FNAME
+echo "---" >> $FNAME
+
+echo >> $FNAME
+
+"$JEKYLL_EDITOR" $FNAME
+
+exit 0
