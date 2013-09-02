@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+# Set to what directory you want to temporarily keep files
+OUTPUT_DIR=/mnt/torrents/tmp
+
+# Auto decompress rar files
+ENABLE_DECOMPRESS=1
+
+# One of "hard", "soft", and "copy"
+DOOP_STYLE="hard"
+
+SB_CATEGORY="tv-shows"
+CP_CATEGORY="movies"
+
+COMPRESSED_EXTS[0]="rar"
+COMPRESSED_EXTS[1]=".1"
+COMPRESSED_EXTS[2]=".01"
+COMPRESSED_EXTS[3]=".001"
+
+UNRAR_CMD=`which unrar`
+
+function doop_file() {
+if [ "$DOOP_STYLE" = "hard" ]
+then
+
+elif [ "$DOOP_STYLE" = "soft" ]
+
+else
+
+fi
+}
+
+function test_extension() {
+for ext in $2
+do
+
+if [ "$1" = "$ext" ]
+then
+        return 0
+fi
+done
+return 1
+}
+
+function process_file() {
+local extension=`echo "$1"|awk -F . '{print $NF}'`
+
+if [ test_extension "$extension" $COMPRESSED_EXTS ] && [ $ENABLE_DECOMPRESS -eq 1 ]
+then
+        $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
+else
+        doop_file "$1"
+fi
+}
+
+CATEGORY="other"
+OIFS=$IFS
+IFS='/'
+for dir in $TR_TORRENT_DIR
+do
+        if [ "$dir" = "$SB_CATEGORY" ]
+        then
+                CATEGORY=$SB_CATEGORY
+        elif [ "$dir" = "$CP_CATEGORY" ]
+        then
+                CATEGORY=$CP_CATEGORY
+        fi
+done
+IFS=$OIFS
+
+OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
+mkdir -p $OUTPUT_DIR
+builtin cd $OUTPUT_DIR
+
+find "$TR_TORRENT_DIR/$TR_TORRENT_NAME" -type f | while read file; do process_file "$file"; done

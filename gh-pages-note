@@ -22,7 +22,7 @@ FNAME_DATE=$(date "+%Y-%m-%d")
 FNAME_POST_TITLE=`echo $TITLE | tr ' ' "-"`
 FNAME="$POSTDIR/$FNAME_DATE-$FNAME_POST_TITLE.md"
 
-YAML_DATE=$(date "+%B %d %Y %H:%M")
+YAML_DATE=$(date "+%B %d %Y")
 
 touch "$FNAME"
 

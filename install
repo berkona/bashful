@@ -1,6 +1,6 @@
 
-INSTALL_DIR="/usr/bin"
-INSTALL_FILES="gh-pages-commit gh-pages-note"
+INSTALL_DIR="/usr/local/bin"
+INSTALL_FILES="gh-pages-commit gh-pages-note transmission-to-media"
 WORKING_DIR=`pwd`
 
 for file in $INSTALL_FILES
