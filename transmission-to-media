@@ -80,15 +80,15 @@ mkdir -p $OUTPUT_DIR
 builtin cd $OUTPUT_DIR
 
 # Process files into temp directory
-for $file in $(find "$REAL_ROOT" -type f)
+for file in $(find "$REAL_ROOT" -type f)
 do
-        extension=`echo "$1"|awk -F . '{print $NF}'`
+        extension=`echo "$file"|awk -F . '{print $NF}'`
 
         if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
         then
-                $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
+                $UNRAR_CMD x -o+ -y -idp "$file" >> unrar.log \;
         else
-                doop_file "$1"
+                doop_file "$file"
         fi
 done
 
