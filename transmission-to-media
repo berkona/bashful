@@ -112,7 +112,7 @@ function main() {
         then
                 SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
                 SB_DATA="dir=`urlencode $OUTPUT_DIR`"
-                wget --post-data="$SB_DATA" "$SB_URL"
+                wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" > /dev/null
         elif ["$CATEGORY" = "$CP_CATEGORY" ]
         then
                 CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
@@ -120,6 +120,7 @@ function main() {
                 wget "$CP_URL/$CP_CMD"
         fi
 
+        # Delete empty folders
         builtin cd "$TEMP_DIR"
         find * -depth -type d -empty -delete
 }
