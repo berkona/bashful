@@ -83,14 +83,17 @@ function main() {
 
         REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-        if [ ! -f "$REAL_ROOT" ]
+        echo "Got torrent '$REAL_ROOT'."
+        if [ ! -f $REAL_ROOT ]
         then
+                echo "Torrent is directory, creating sub-folder."
                 OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
         fi
 
         mkdir -p $OUTPUT_DIR
         builtin cd $OUTPUT_DIR
 
+        echo "Processing files."
         # Process files into temp directory
         for file in $(find "$REAL_ROOT" -type f)
         do
