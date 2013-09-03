@@ -97,8 +97,8 @@ function main() {
                 OUTPUT_DIR=`echo "$OUTPUT_DIR/$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
         fi
 
-        mkdir -p "$OUTPUT_DIR"
-        builtin cd "$OUTPUT_DIR"
+        mkdir -p $OUTPUT_DIR
+        builtin cd $OUTPUT_DIR
 
         # Process files into temp directory
         echo "Finding files under torrent name."
