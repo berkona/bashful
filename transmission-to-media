@@ -31,38 +31,27 @@ COMPRESSED_EXTS[3]=".001"
 UNRAR_CMD=`which unrar`
 
 function doop_file() {
-if [ "$DOOP_STYLE" = "hard" ]
-then
-        ln "$1" $OUTPUT_DIR
-elif [ "$DOOP_STYLE" = "soft" ]
-then
-        ln -s "$1" $OUTPUT_DIR
-else
-        cp "$1" $OUTPUT_DIR
-fi
-}
+        if [ "$DOOP_STYLE" = "hard" ]
+        then
+                ln "$1" $OUTPUT_DIR
+        elif [ "$DOOP_STYLE" = "soft" ]
+        then
+                ln -s "$1" $OUTPUT_DIR
+        else
+                cp "$1" $OUTPUT_DIR
+        fi
+        }
 
 function test_extension() {
-for ext in $2
-do
+        for ext in $2
+        do
 
-if [ "$1" = "$ext" ]
-then
-        return 0
-fi
-done
-return 1
-}
-
-function process_file() {
-local extension=`echo "$1"|awk -F . '{print $NF}'`
-
-if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
-then
-        $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
-else
-        doop_file "$1"
-fi
+        if [ "$1" = "$ext" ]
+        then
+                return 0
+        fi
+        done
+        return 1
 }
 
 CATEGORY="other"
@@ -80,12 +69,28 @@ do
 done
 IFS=$OIFS
 
+REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
 OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
+if [ ! -f $REAL_ROOT ]
+then
+        OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
+fi
+
 mkdir -p $OUTPUT_DIR
 builtin cd $OUTPUT_DIR
 
 # Process files into temp directory
-find "$TR_TORRENT_DIR/$TR_TORRENT_NAME" -type f | while read file; do process_file "$file"; done
+for $file in $(find "$REAL_ROOT" -type f)
+do
+        extension=`echo "$1"|awk -F . '{print $NF}'`
+
+        if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
+        then
+                $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
+        else
+                doop_file "$1"
+        fi
+done
 
 # Send update to either SB or CP
 # if [ "$CATEGORY" = "$SB_CATEGORY" ]
