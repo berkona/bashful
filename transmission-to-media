@@ -68,10 +68,10 @@ function process_file() {
 }
 
 function main() {
-        TR_TORRENT_DIR=`echo "$TR_TORRENT_DIR" | sed -e 's/\ /\\\ /g'`
-        TR_TORRENT_NAME=`echo "$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
-        echo "Escaped torrent directory: '$TR_TORRENT_DIR'."
-        echo "Escaped torrent name: '$TR_TORRENT_NAME'."
+        # TR_TORRENT_DIR=`echo "$TR_TORRENT_DIR" | sed -e 's/\ /\\\ /g'`
+        # TR_TORRENT_NAME=`echo "$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
+        echo "Torrent directory: '$TR_TORRENT_DIR'."
+        echo "Torrent name: '$TR_TORRENT_NAME'."
 
         REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
         echo "Real file: '$REAL_ROOT'."
@@ -93,18 +93,18 @@ function main() {
         echo "Category is '$CATEGORY'."
 
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-        if [[ ! -f $REAL_ROOT ]]
+        if [ ! -f ` echo "$REAL_ROOT" | sed -e 's/\ /\\\ /g'` ]
         then
                 echo "Torrent is directory, creating sub-folder."
                 OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
         fi
 
-        mkdir -p $OUTPUT_DIR
-        builtin cd $OUTPUT_DIR
+        mkdir -p "$OUTPUT_DIR"
+        builtin cd "$OUTPUT_DIR"
 
         # Process files into temp directory
         echo "Finding files under torrent name."
-        find $REAL_ROOT -type f | while read file; do process_file $file; done
+        find "$REAL_ROOT" -type f | while read file; do process_file $file; done
 
         # Send update to either SB or CP
         # if [ "$CATEGORY" = "$SB_CATEGORY" ]
