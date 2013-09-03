@@ -68,6 +68,7 @@ function process_file() {
 }
 
 function main() {
+        echo "====== Starting Transmission To Media ======"
         # TR_TORRENT_DIR=`echo "$TR_TORRENT_DIR" | sed -e 's/\ /\\\ /g'`
         # TR_TORRENT_NAME=`echo "$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
         echo "Torrent directory: '$TR_TORRENT_DIR'."
