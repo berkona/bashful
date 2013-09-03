@@ -69,8 +69,6 @@ function process_file() {
 
 function main() {
         echo "====== Starting Transmission To Media ======"
-        # TR_TORRENT_DIR=`echo "$TR_TORRENT_DIR" | sed -e 's/\ /\\\ /g'`
-        # TR_TORRENT_NAME=`echo "$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
         echo "Torrent directory: '$TR_TORRENT_DIR'."
         echo "Torrent name: '$TR_TORRENT_NAME'."
 
@@ -110,17 +108,17 @@ function main() {
         find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
 
         # Send update to either SB or CP
-        # if [ "$CATEGORY" = "$SB_CATEGORY" ]
-        # then
-        #         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
-        #         SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
-        #         wget --post-data="$SB_DATA" "$SB_URL"
-        # if ["$CATEGORY" = "$CP_CATEGORY" ]
-        # then
-        #         CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
-        #         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
-        #         wget "$CP_URL/$CP_CMD"
-        # fi
+        if [ "$CATEGORY" = "$SB_CATEGORY" ]
+        then
+                SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
+                SB_DATA="dir=`urlencode $OUTPUT_DIR`"
+                wget --post-data="$SB_DATA" "$SB_URL"
+        elif ["$CATEGORY" = "$CP_CATEGORY" ]
+        then
+                CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
+                CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
+                wget "$CP_URL/$CP_CMD"
+        fi
 
         builtin cd "$TEMP_DIR"
         find * -depth -type d -empty -delete
