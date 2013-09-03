@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set to what directory you want to temporarily keep files
-OUTPUT_DIR=/mnt/torrents/tmp
+OUTPUT_DIR=/mnt/tmp
 LOG_FILE="$OUTPUT_DIR/postprocessing.log"
 
 # Set up for SickBeard & CouchPotato
