@@ -83,7 +83,7 @@ function main() {
 
         REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-        if [ ! -f $REAL_ROOT ]
+        if [ ! -f "$REAL_ROOT" ]
         then
                 OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
         fi
