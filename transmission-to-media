@@ -34,12 +34,12 @@ UNRAR_CMD=`which unrar`
 function doop_file() {
         if [ "$DOOP_STYLE" = "hard" ]
         then
-                ln "$1" $OUTPUT_DIR
+                ln "$1" "$OUTPUT_DIR"
         elif [ "$DOOP_STYLE" = "soft" ]
         then
-                ln -s "$1" $OUTPUT_DIR
+                ln -s "$1" "$OUTPUT_DIR"
         else
-                cp "$1" $OUTPUT_DIR
+                cp "$1" "$OUTPUT_DIR"
         fi
         }
 
@@ -106,7 +106,7 @@ function main() {
 
         # Process files into temp directory
         echo "Finding files under torrent name."
-        find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
+        find "$REAL_ROOT" -type f | while read file; do process_file "$file"ec; done
 
         # Send update to either SB or CP
         # if [ "$CATEGORY" = "$SB_CATEGORY" ]
