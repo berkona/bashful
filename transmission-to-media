@@ -57,7 +57,7 @@ return 1
 function process_file() {
 local extension=`echo "$1"|awk -F . '{print $NF}'`
 
-if test_extension "$extension" $COMPRESSED_EXTS && [ $ENABLE_DECOMPRESS -eq 1 ]
+if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
 then
         $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
 else
@@ -91,7 +91,7 @@ find "$TR_TORRENT_DIR/$TR_TORRENT_NAME" -type f | while read file; do process_fi
 if [ "$CATEGORY" = "$SB_CATEGORY" ]
 then
         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
-        SB_DATA=`urlencode "episodeDir=$OUTPUT_DIR"`
+        SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
         wget --user="$SB_USER" --password="$SB_PASS" --post-data="$SB_DATA" "$SB_URL"
 elif ["$CATEGORY" = "$CP_CATEGORY" ]
 then
