@@ -88,14 +88,14 @@ builtin cd $OUTPUT_DIR
 find "$TR_TORRENT_DIR/$TR_TORRENT_NAME" -type f | while read file; do process_file "$file"; done
 
 # Send update to either SB or CP
-if [ "$CATEGORY" = "$SB_CATEGORY" ]
-then
-        SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
-        SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
-        wget --user="$SB_USER" --password="$SB_PASS" --post-data="$SB_DATA" "$SB_URL"
-elif ["$CATEGORY" = "$CP_CATEGORY" ]
-then
-        CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
-        CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
-        wget "$CP_URL/$CP_CMD"
-fi
+# if [ "$CATEGORY" = "$SB_CATEGORY" ]
+# then
+#         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
+#         SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
+#         wget --post-data="$SB_DATA" "$SB_URL"
+# elif ["$CATEGORY" = "$CP_CATEGORY" ]
+# then
+#         CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
+#         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
+#         wget "$CP_URL/$CP_CMD"
+# fi
