@@ -2,6 +2,7 @@
 
 # Set to what directory you want to temporarily keep files
 OUTPUT_DIR=/mnt/torrents/tmp
+LOG_FILE="$OUTPUT_DIR/postprocessing.log"
 
 # Set up for SickBeard & CouchPotato
 SB_HOST="localhost"
@@ -67,8 +68,11 @@ function process_file() {
 }
 
 function main() {
-        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
-        echo "Got torrent '$REAL_ROOT'."
+        echo "Torrent directory: '$TR_TORRENT_DIR'."
+        echo "Torrent name: '$TR_TORRENT_NAME'."
+
+        REAL_ROOT=`echo "$TR_TORRENT_DIR/$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
+        echo "Real file: '$REAL_ROOT'."
 
         CATEGORY="other"
         OIFS=$IFS
@@ -84,7 +88,7 @@ function main() {
                 fi
         done
         IFS=$OIFS
-        echo "Category is $CATEGORY."
+        echo "Category is '$CATEGORY'."
 
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
         if [[ ! -f "$REAL_ROOT" ]]
@@ -93,8 +97,8 @@ function main() {
                 OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
         fi
 
-        mkdir -p $OUTPUT_DIR
-        builtin cd $OUTPUT_DIR
+        mkdir -p "$OUTPUT_DIR"
+        builtin cd "$OUTPUT_DIR"
 
         # Process files into temp directory
         echo "Finding files under torrent name."
@@ -114,4 +118,4 @@ function main() {
         # fi
 }
 
-main >> "$OUTPUT_DIR/postprocessing.log" 2>&1
+main >> "$LOG_FILE" 2>&1
