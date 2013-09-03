@@ -66,6 +66,9 @@ function process_file() {
 }
 
 function main() {
+        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
+        echo "Got torrent '$REAL_ROOT'."
+
         CATEGORY="other"
         OIFS=$IFS
         IFS='/'
@@ -80,10 +83,9 @@ function main() {
                 fi
         done
         IFS=$OIFS
+        echo "Category is $CATEGORY."
 
-        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-        echo "Got torrent '$REAL_ROOT'."
         if [[ ! -f "$REAL_ROOT" ]]
         then
                 echo "Torrent is directory, creating sub-folder."
@@ -93,10 +95,11 @@ function main() {
         mkdir -p $OUTPUT_DIR
         builtin cd $OUTPUT_DIR
 
-        echo "Processing files."
+        echo "Finding files under torrent name."
         # Process files into temp directory
         for file in $(find "$REAL_ROOT" -type f)
         do
+                echo "Processing file $file"
                 process_file "$file"
         done
 
