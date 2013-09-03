@@ -3,7 +3,17 @@
 # Set to what directory you want to temporarily keep files
 OUTPUT_DIR=/mnt/torrents/tmp
 
-# Auto decompress rar files
+# Set up for SickBeard & CouchPotato
+SB_HOST="127.0.0.1"
+SB_PORT="8081"
+SB_USER=""
+SB_PASS=""
+
+CP_HOST="127.0.0.1"
+CP_PORT="5050"
+CP_KEY=""
+
+# Auto decompress rar files, 1 enables, 0 disables
 ENABLE_DECOMPRESS=1
 
 # One of "hard", "soft", and "copy"
@@ -17,16 +27,18 @@ COMPRESSED_EXTS[1]=".1"
 COMPRESSED_EXTS[2]=".01"
 COMPRESSED_EXTS[3]=".001"
 
+# Change this if unrar isn't on the PATH variable
 UNRAR_CMD=`which unrar`
 
 function doop_file() {
 if [ "$DOOP_STYLE" = "hard" ]
 then
-
+        ln "$1" $OUTPUT_DIR
 elif [ "$DOOP_STYLE" = "soft" ]
-
+then
+        ln -s "$1" $OUTPUT_DIR
 else
-
+        cp "$1" $OUTPUT_DIR
 fi
 }
 
@@ -72,4 +84,17 @@ OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
 mkdir -p $OUTPUT_DIR
 builtin cd $OUTPUT_DIR
 
+# Process files into temp dir
 find "$TR_TORRENT_DIR/$TR_TORRENT_NAME" -type f | while read file; do process_file "$file"; done
+
+
+if [ "$CATEGORY" = "$SB_CATEGORY" ]
+then
+        SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
+        SB_DATA="episodeDir=$OUTPUT_DIR"
+        wget --user=$SB_USER --password=$SB_PASS --post-data=$SB_DATA $SB_URL
+elif ["$CATEGORY" = "$CP_CATEGORY" ]
+then
+        CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY/renamer.scan/?movie_folder=$OUTPUT_DIR"
+        wget $CP_URL
+fi
