@@ -93,7 +93,9 @@ function main() {
         echo "Category is '$CATEGORY'."
 
         OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-        if [[ ! -f `echo "$REAL_ROOT" | sed -e 's/\ /\\\ /g'` ]]
+
+        builtin cd $TR_TORRENT_DIR
+        if [[ ! -f $TR_TORRENT_NAME ]]
         then
                 echo "Torrent is directory, creating sub-folder."
                 OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
