@@ -55,6 +55,7 @@ function test_extension() {
 }
 
 function process_file() {
+        echo "Processing file '$1'"
         extension=`echo "$1"|awk -F . '{print $NF}'`
 
         if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
@@ -95,13 +96,9 @@ function main() {
         mkdir -p $OUTPUT_DIR
         builtin cd $OUTPUT_DIR
 
-        echo "Finding files under torrent name."
         # Process files into temp directory
-        for file in $(find "$REAL_ROOT" -type f)
-        do
-                echo "Processing file $file"
-                process_file "$file"
-        done
+        echo "Finding files under torrent name."
+        find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
 
         # Send update to either SB or CP
         # if [ "$CATEGORY" = "$SB_CATEGORY" ]
