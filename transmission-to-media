@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Set to what directory you want to temporarily keep files
-OUTPUT_DIR=/mnt/tmp
-LOG_FILE="$OUTPUT_DIR/postprocessing.log"
+TEMP_DIR=/mnt/tmp
+LOG_FILE="$TEMP_DIR/postprocessing.log"
 
 # Set up for SickBeard & CouchPotato
 SB_HOST="localhost"
@@ -92,7 +92,7 @@ function main() {
         IFS=$OIFS
         echo "Category is '$CATEGORY'."
 
-        OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
+        OUTPUT_DIR="$TEMP_DIR/$CATEGORY"
 
         builtin cd $TR_TORRENT_DIR
         if [[ ! -f $TR_TORRENT_NAME ]]
@@ -120,6 +120,9 @@ function main() {
         #         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
         #         wget "$CP_URL/$CP_CMD"
         # fi
+
+        builtin cd "$TEMP_DIR"
+        find * -depth -type d -empty -delete
 }
 
 main >> "$LOG_FILE" 2>&1
