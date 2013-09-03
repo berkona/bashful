@@ -54,53 +54,61 @@ function test_extension() {
         return 1
 }
 
-CATEGORY="other"
-OIFS=$IFS
-IFS='/'
-for dir in $TR_TORRENT_DIR
-do
-        if [ "$dir" = "$SB_CATEGORY" ]
-        then
-                CATEGORY=$SB_CATEGORY
-        elif [ "$dir" = "$CP_CATEGORY" ]
-        then
-                CATEGORY=$CP_CATEGORY
-        fi
-done
-IFS=$OIFS
-
-REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
-OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
-if [ ! -f $REAL_ROOT ]
-then
-        OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
-fi
-
-mkdir -p $OUTPUT_DIR
-builtin cd $OUTPUT_DIR
-
-# Process files into temp directory
-for file in $(find "$REAL_ROOT" -type f)
-do
-        extension=`echo "$file"|awk -F . '{print $NF}'`
+function process_file() {
+        extension=`echo "$1"|awk -F . '{print $NF}'`
 
         if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
         then
-                $UNRAR_CMD x -o+ -y -idp "$file" >> unrar.log \;
+                $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log
         else
-                doop_file "$file"
+                doop_file "$1"
         fi
-done
+}
 
-# Send update to either SB or CP
-# if [ "$CATEGORY" = "$SB_CATEGORY" ]
-# then
-#         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
-#         SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
-#         wget --post-data="$SB_DATA" "$SB_URL"
-# elif ["$CATEGORY" = "$CP_CATEGORY" ]
-# then
-#         CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
-#         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
-#         wget "$CP_URL/$CP_CMD"
-# fi
+function main() {
+        CATEGORY="other"
+        OIFS=$IFS
+        IFS='/'
+        for dir in $TR_TORRENT_DIR
+        do
+                if [ "$dir" = "$SB_CATEGORY" ]
+                then
+                        CATEGORY=$SB_CATEGORY
+                elif [ "$dir" = "$CP_CATEGORY" ]
+                then
+                        CATEGORY=$CP_CATEGORY
+                fi
+        done
+        IFS=$OIFS
+
+        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
+        OUTPUT_DIR="$OUTPUT_DIR/$CATEGORY"
+        if [ ! -f $REAL_ROOT ]
+        then
+                OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
+        fi
+
+        mkdir -p $OUTPUT_DIR
+        builtin cd $OUTPUT_DIR
+
+        # Process files into temp directory
+        for file in $(find "$REAL_ROOT" -type f)
+        do
+                process_file "$file"
+        done
+
+        # Send update to either SB or CP
+        # if [ "$CATEGORY" = "$SB_CATEGORY" ]
+        # then
+        #         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
+        #         SB_DATA="episodeDir=`urlencode $OUTPUT_DIR`"
+        #         wget --post-data="$SB_DATA" "$SB_URL"
+        # elif ["$CATEGORY" = "$CP_CATEGORY" ]
+        # then
+        #         CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
+        #         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
+        #         wget "$CP_URL/$CP_CMD"
+        # fi
+}
+
+main >> "$OUTPUT_DIR/postprocessing.log"
