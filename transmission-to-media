@@ -106,7 +106,7 @@ function main() {
 
         # Process files into temp directory
         echo "Finding files under torrent name."
-        find "$REAL_ROOT" -type f | while read file; do process_file "$file"ec; done
+        find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
 
         # Send update to either SB or CP
         # if [ "$CATEGORY" = "$SB_CATEGORY" ]
