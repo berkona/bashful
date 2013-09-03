@@ -4,12 +4,12 @@
 OUTPUT_DIR=/mnt/torrents/tmp
 
 # Set up for SickBeard & CouchPotato
-SB_HOST="127.0.0.1"
+SB_HOST="localhost"
 SB_PORT="8081"
 SB_USER=""
 SB_PASS=""
 
-CP_HOST="127.0.0.1"
+CP_HOST="localhost"
 CP_PORT="5050"
 CP_KEY=""
 
