@@ -57,7 +57,7 @@ return 1
 function process_file() {
 local extension=`echo "$1"|awk -F . '{print $NF}'`
 
-if [ test_extension "$extension" $COMPRESSED_EXTS ] && [ $ENABLE_DECOMPRESS -eq 1 ]
+if test_extension "$extension" $COMPRESSED_EXTS && [ $ENABLE_DECOMPRESS -eq 1 ]
 then
         $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log \;
 else
