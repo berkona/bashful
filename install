@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+# Change if you don't want to install to /usr/local/bin
 INSTALL_DIR="/usr/local/bin"
+
+# You shouldn't have to change this, unless the scripts are not where the install file is
 WORKING_DIR=`pwd`
 
-function install_file() {
+for file in $(find * ! -iname "install")
+do
 	if [ -f "$INSTALL_DIR/$1" ]
 	then
 		echo "Removing old symlink at $INSTALL_DIR/$1"
@@ -12,6 +16,4 @@ function install_file() {
 
 	echo "Symlinking $WORKING_DIR/$file  to $INSTALL_DIR/$1"
 	ln -s "$WORKING_DIR/$file" "$INSTALL_DIR/$1"
-}
-
-find * ! -iname "install" | while read file; do install_file "$file"; done
+done
