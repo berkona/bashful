@@ -92,9 +92,10 @@ if [ "$CATEGORY" = "$SB_CATEGORY" ]
 then
         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
         SB_DATA=`urlencode "episodeDir=$OUTPUT_DIR"`
-        wget --user=$SB_USER --password=$SB_PASS --post-data=$SB_DATA $SB_URL
+        wget --user="$SB_USER" --password="$SB_PASS" --post-data="$SB_DATA" "$SB_URL"
 elif ["$CATEGORY" = "$CP_CATEGORY" ]
 then
-        CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY/renamer.scan/?movie_folder=$OUTPUT_DIR"
-        wget $CP_URL
+        CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
+        CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
+        wget "$CP_URL/$CP_CMD"
 fi
