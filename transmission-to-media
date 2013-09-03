@@ -68,10 +68,12 @@ function process_file() {
 }
 
 function main() {
-        echo "Torrent directory: '$TR_TORRENT_DIR'."
-        echo "Torrent name: '$TR_TORRENT_NAME'."
+        TR_TORRENT_DIR=`echo $TR_TORRENT_DIR | sed -e 's/\ /\\\ /g'`
+        $TR_TORRENT_NAME=`echo $TR_TORRENT_NAME | sed -e 's/\ /\\\ /g'`
+        echo "Escaped torrent directory: '$TR_TORRENT_DIR'."
+        echo "Escaped torrent name: '$TR_TORRENT_NAME'."
 
-        REAL_ROOT=`echo "$TR_TORRENT_DIR/$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
+        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
         echo "Real file: '$REAL_ROOT'."
 
         CATEGORY="other"
@@ -94,7 +96,7 @@ function main() {
         if [[ ! -f $REAL_ROOT ]]
         then
                 echo "Torrent is directory, creating sub-folder."
-                OUTPUT_DIR=`echo "$OUTPUT_DIR/$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
+                OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
         fi
 
         mkdir -p $OUTPUT_DIR
