@@ -68,8 +68,8 @@ function process_file() {
 }
 
 function main() {
-        TR_TORRENT_DIR=`echo $TR_TORRENT_DIR | sed -e 's/\ /\\\ /g'`
-        $TR_TORRENT_NAME=`echo $TR_TORRENT_NAME | sed -e 's/\ /\\\ /g'`
+        TR_TORRENT_DIR=`echo "$TR_TORRENT_DIR" | sed -e 's/\ /\\\ /g'`
+        TR_TORRENT_NAME=`echo "$TR_TORRENT_NAME" | sed -e 's/\ /\\\ /g'`
         echo "Escaped torrent directory: '$TR_TORRENT_DIR'."
         echo "Escaped torrent name: '$TR_TORRENT_NAME'."
 
