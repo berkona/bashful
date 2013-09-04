@@ -23,11 +23,6 @@ DOOP_STYLE="hard"
 SB_CATEGORY="tv-shows"
 CP_CATEGORY="movies"
 
-COMPRESSED_EXTS[0]="rar"
-COMPRESSED_EXTS[1]=".1"
-COMPRESSED_EXTS[2]=".01"
-COMPRESSED_EXTS[3]=".001"
-
 # Change this if unrar isn't on the PATH variable
 UNRAR_CMD=`which unrar`
 
@@ -59,9 +54,13 @@ function process_file() {
         echo "Processing file '$1'"
         extension=`echo "$1"|awk -F . '{print $NF}'`
 
-        if [ $ENABLE_DECOMPRESS -eq 1 ] && test_extension "$extension" $COMPRESSED_EXTS
+        if [ $ENABLE_DECOMPRESS -eq 1 ] && [ $extension =~ "/^rar|1|01|001$/" ]
         then
                 $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log
+        elif [ $ENABLE_DECOMPRESS -eq 1 ] && [ $extension =~ "/^r[0-9]+$/" ]
+        then
+                # Part of archive, skip it
+                return 0
         else
                 doop_file "$1"
         fi
