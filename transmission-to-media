@@ -26,8 +26,8 @@ CP_CATEGORY="movies"
 # Change this if unrar isn't on the PATH variable
 UNRAR_CMD=`which unrar`
 
-RAR_REGEX="/^rar|1|01|001$/"
-RAR_PARTIAL="/^r[0-9]+$/"
+RAR_REGEX="rar|1|01|001"
+RAR_PARTIAL="r[0-9]+"
 
 function doop_file() {
         echo "Duplicating file using $DOOP_STYLE style."
