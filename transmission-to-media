@@ -50,7 +50,7 @@ function process_file() {
         if [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_REGEX ]]
         then
                 echo 'Calling unrar'
-                $UNRAR_CMD x -o+ -y -idp "$1" >> "$TEMP_DIR/unrar.log"
+                $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log"
         elif [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_PARTIAL ]]
         then
                 echo 'File is part of archive, skipping it.'
