@@ -26,6 +26,9 @@ CP_CATEGORY="movies"
 # Change this if unrar isn't on the PATH variable
 UNRAR_CMD=`which unrar`
 
+RAR_REGEX="/^rar|1|01|001$/"
+RAR_PARTIAL="/^r[0-9]+$/"
+
 function doop_file() {
         if [ "$DOOP_STYLE" = "hard" ]
         then
@@ -54,10 +57,10 @@ function process_file() {
         echo "Processing file '$1'"
         extension=`echo "$1"|awk -F . '{print $NF}'`
 
-        if [ $ENABLE_DECOMPRESS -eq 1 ] && [ $extension =~ "/^rar|1|01|001$/" ]
+        if [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_REGEX ]]
         then
-                $UNRAR_CMD x -o+ -y -idp "$1" >> unrar.log
-        elif [ $ENABLE_DECOMPRESS -eq 1 ] && [ $extension =~ "/^r[0-9]+$/" ]
+                $UNRAR_CMD x -o+ -y -idp "$1" >> "$TEMP_DIR/unrar.log"
+        elif [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_PARTIAL ]]
         then
                 # Part of archive, skip it
                 return 0
