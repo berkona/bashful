@@ -30,6 +30,7 @@ RAR_REGEX="/^rar|1|01|001$/"
 RAR_PARTIAL="/^r[0-9]+$/"
 
 function doop_file() {
+        echo 'Duplicating file using $DOOP_STYLE style.'
         if [ "$DOOP_STYLE" = "hard" ]
         then
                 ln "$1" "$OUTPUT_DIR"
@@ -42,14 +43,17 @@ function doop_file() {
 }
 
 function process_file() {
-        echo "Processing file '$1'"
+        echo "Processing file '$1'."
         extension=`echo "$1"|awk -F . '{print $NF}'`
+        echo "Extension is '$extension'"
 
         if [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_REGEX ]]
         then
+                echo 'Calling unrar'
                 $UNRAR_CMD x -o+ -y -idp "$1" >> "$TEMP_DIR/unrar.log"
         elif [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_PARTIAL ]]
         then
+                echo 'File is part of archive, skipping it.'
                 # Part of archive, skip it
                 return 0
         else
