@@ -30,7 +30,7 @@ RAR_REGEX="/^rar|1|01|001$/"
 RAR_PARTIAL="/^r[0-9]+$/"
 
 function doop_file() {
-        echo 'Duplicating file using $DOOP_STYLE style.'
+        echo "Duplicating file using $DOOP_STYLE style."
         if [ "$DOOP_STYLE" = "hard" ]
         then
                 ln "$1" "$OUTPUT_DIR"
