@@ -39,18 +39,6 @@ function doop_file() {
         else
                 cp "$1" "$OUTPUT_DIR"
         fi
-        }
-
-function test_extension() {
-        for ext in $2
-        do
-
-        if [ "$1" = "$ext" ]
-        then
-                return 0
-        fi
-        done
-        return 1
 }
 
 function process_file() {
@@ -115,16 +103,12 @@ function main() {
                 SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
                 SB_DATA="dir=`urlencode $OUTPUT_DIR`"
                 wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null &
-        elif ["$CATEGORY" = "$CP_CATEGORY" ]
+        elif [ "$CATEGORY" = "$CP_CATEGORY" ]
         then
                 CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
                 CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
                 wget "$CP_URL/$CP_CMD" -O /dev/null &
         fi
-
-        # Delete empty folders
-        builtin cd "$TEMP_DIR"
-        find * -depth -type d -empty -delete
 }
 
 main >> "$LOG_FILE" 2>&1
