@@ -27,7 +27,7 @@ CP_CATEGORY="movies"
 UNRAR_CMD=`which unrar`
 
 RAR_REGEX="rar|1|01|001"
-RAR_PARTIAL="r[0-9]+"
+RAR_PARTIAL="r[0-9]+|[0-9]+"
 
 function doop_file() {
         if [ "$DOOP_STYLE" = "hard" ]
