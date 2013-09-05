@@ -109,6 +109,8 @@ function main() {
                 CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
                 wget "$CP_URL/$CP_CMD" -O /dev/null
         fi
+
+        find "$TEMP_DIR" -depth -empty -delete
 }
 
 main >> "$LOG_FILE" 2>&1
