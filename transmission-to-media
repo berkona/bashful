@@ -64,6 +64,11 @@ function process_file() {
         fi
 }
 
+function delete_dir() {
+    echo "Deleting empty directory '$1'"
+    rmdir "$1"
+}
+
 function main() {
         echo "====== Starting Transmission To Media ======"
         echo "Torrent directory: '$TR_TORRENT_DIR'."
@@ -117,7 +122,8 @@ function main() {
                 wget "$CP_URL/$CP_CMD" -O /dev/null &
         fi
 
-        find "$TEMP_DIR" -depth -empty -delete
+        echo "Deleting empty directories"
+        find "$TEMP_DIR" -depth -empty | while read dir; do delete_dir "$dir"; done
 }
 
 main >> "$LOG_FILE" 2>&1
