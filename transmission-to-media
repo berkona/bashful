@@ -115,13 +115,13 @@ function main() {
         echo "Notifying SickBeard."
         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
         SB_DATA="dir=`urlencode $OUTPUT_DIR`"
-        wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null >> /dev/null &
+        wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null >> /dev/null 2>&1 &
     elif [ "$CATEGORY" = "$CP_CATEGORY" ]
     then
         echo "Notifying CouchPotato."
         CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
         CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
-        wget "$CP_URL/$CP_CMD" -O /dev/null >> /dev/null &
+        wget "$CP_URL/$CP_CMD" -O /dev/null >> /dev/null 2>&1 &
     fi
 
     echo "Deleting empty directories"
