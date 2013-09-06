@@ -31,7 +31,7 @@ RAR_PARTIAL="r[0-9]+|[0-9]+"
 
 function decompress_file() {
     if [ ! $ENABLE_DECOMPRESS -eq 1 ]; then
-        return -1
+        return 1
     fi
 
     if [[ $extension =~ $RAR_REGEX ]]; then
@@ -40,7 +40,7 @@ function decompress_file() {
     elif [[ $extension =~ $RAR_PARTIAL ]]; then
         return 0
     fi
-    return -1
+    return 1
 }
 
 function doop_file() {
