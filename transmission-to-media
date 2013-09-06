@@ -29,15 +29,27 @@ UNRAR_CMD=`which unrar`
 RAR_REGEX="rar|1|01|001"
 RAR_PARTIAL="r[0-9]+|[0-9]+"
 
+function decompress_file() {
+    if [ ! ($ENABLE_DECOMPRESS -eq 1) ]; then
+        return -1
+    fi
+
+    if [[ $extension =~ $RAR_REGEX ]]; then
+        $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
+        return 0
+    elif [[ $extension =~ $RAR_PARTIAL ]]; then
+        return 0
+    fi
+    return -1
+}
+
 function doop_file() {
-        if [ "$DOOP_STYLE" = "hard" ]
-        then
+        if [ "$DOOP_STYLE" = "hard" ]; then
                 ln "$1" "$OUTPUT_DIR"
-        elif [ "$DOOP_STYLE" = "soft" ]
-        then
+        elif [ "$DOOP_STYLE" = "soft" ]; then
                 ln -s "$1" "$OUTPUT_DIR"
         else
-                cp "$1" "$OUTPUT_DIR"
+                cp "$1" "$OUTPUT_DIR" &
         fi
 }
 
@@ -45,15 +57,10 @@ function process_file() {
         echo "Processing file '$1'."
         extension=`echo "$1"|awk -F . '{print $NF}'`
 
-        if [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_REGEX ]]
-        then
-                $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log"
-        elif [ $ENABLE_DECOMPRESS -eq 1 ] && [[ $extension =~ $RAR_PARTIAL ]]
-        then
-                # Part of archive, skip it
-                return 0
-        else
-                doop_file "$1"
+        decompress_file "$1"
+
+        if [ ! $? -eq 0 ]; then
+            doop_file "$1"
         fi
 }
 
@@ -113,4 +120,4 @@ function main() {
         find "$TEMP_DIR" -depth -empty -delete
 }
 
-main >> "$LOG_FILE" 2>&1 &
+main >> "$LOG_FILE" 2>&1
