@@ -44,24 +44,24 @@ function decompress_file() {
 }
 
 function doop_file() {
-        if [ "$DOOP_STYLE" = "hard" ]; then
-                ln "$1" "$OUTPUT_DIR"
-        elif [ "$DOOP_STYLE" = "soft" ]; then
-                ln -s "$1" "$OUTPUT_DIR"
-        else
-                cp "$1" "$OUTPUT_DIR" &
-        fi
+    if [ "$DOOP_STYLE" = "hard" ]; then
+        ln "$1" "$OUTPUT_DIR"
+    elif [ "$DOOP_STYLE" = "soft" ]; then
+        ln -s "$1" "$OUTPUT_DIR"
+    else
+        cp "$1" "$OUTPUT_DIR" &
+    fi
 }
 
 function process_file() {
-        echo "Processing file '$1'."
-        extension=`echo "$1"|awk -F . '{print $NF}'`
+    echo "Processing file '$1'."
+    extension=`echo "$1"|awk -F . '{print $NF}'`
 
-        decompress_file "$1"
+    decompress_file "$1"
 
-        if [ ! $? -eq 0 ]; then
-            doop_file "$1"
-        fi
+    if [ ! $? -eq 0 ]; then
+        doop_file "$1"
+    fi
 }
 
 function delete_dir() {
@@ -70,60 +70,62 @@ function delete_dir() {
 }
 
 function main() {
-        echo "====== Starting Transmission To Media ======"
-        echo "Torrent directory: '$TR_TORRENT_DIR'."
-        echo "Torrent name: '$TR_TORRENT_NAME'."
+    echo "====== Starting Transmission To Media ======"
+    echo "Torrent directory: '$TR_TORRENT_DIR'."
+    echo "Torrent name: '$TR_TORRENT_NAME'."
 
-        REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
-        echo "Real file: '$REAL_ROOT'."
+    REAL_ROOT="$TR_TORRENT_DIR/$TR_TORRENT_NAME"
+    echo "Real file: '$REAL_ROOT'."
 
-        CATEGORY="other"
-        OIFS=$IFS
-        IFS='/'
-        for dir in $TR_TORRENT_DIR
-        do
-                if [ "$dir" = "$SB_CATEGORY" ]
-                then
-                        CATEGORY=$SB_CATEGORY
-                elif [ "$dir" = "$CP_CATEGORY" ]
-                then
-                        CATEGORY=$CP_CATEGORY
-                fi
-        done
-        IFS=$OIFS
-        echo "Category is '$CATEGORY'."
-
-        OUTPUT_DIR="$TEMP_DIR/$CATEGORY"
-
-        builtin cd $TR_TORRENT_DIR
-        if [[ ! -f $TR_TORRENT_NAME ]]
+    CATEGORY="other"
+    OIFS=$IFS
+    IFS='/'
+    for dir in $TR_TORRENT_DIR
+    do
+        if [ "$dir" = "$SB_CATEGORY" ]
         then
-                echo "Torrent is directory, creating sub-folder."
-                OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
+                CATEGORY=$SB_CATEGORY
+        elif [ "$dir" = "$CP_CATEGORY" ]
+        then
+                CATEGORY=$CP_CATEGORY
         fi
+    done
+    IFS=$OIFS
+    echo "Category is '$CATEGORY'."
 
-        mkdir -p "$OUTPUT_DIR"
-        builtin cd "$OUTPUT_DIR"
+    OUTPUT_DIR="$TEMP_DIR/$CATEGORY"
 
-        # Process files into temp directory
-        echo "Finding files under torrent name."
-        find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
+    builtin cd $TR_TORRENT_DIR
+    if [[ ! -f $TR_TORRENT_NAME ]]
+    then
+        echo "Torrent is directory, creating sub-folder."
+        OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
+    fi
 
-        # Send update to either SB or CP
-        if [ "$CATEGORY" = "$SB_CATEGORY" ]
-        then
-                SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
-                SB_DATA="dir=`urlencode $OUTPUT_DIR`"
-                wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null &
-        elif [ "$CATEGORY" = "$CP_CATEGORY" ]
-        then
-                CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
-                CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
-                wget "$CP_URL/$CP_CMD" -O /dev/null &
-        fi
+    mkdir -p "$OUTPUT_DIR"
+    builtin cd "$OUTPUT_DIR"
 
-        echo "Deleting empty directories"
-        find "$TEMP_DIR" -depth -empty | while read dir; do delete_dir "$dir"; done
+    # Process files into temp directory
+    echo "Finding files under torrent name."
+    find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
+
+    # Send update to either SB or CP
+    if [ "$CATEGORY" = "$SB_CATEGORY" ]
+    then
+        echo "Notifying SickBeard."
+        SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
+        SB_DATA="dir=`urlencode $OUTPUT_DIR`"
+        wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null >> /dev/null &
+    elif [ "$CATEGORY" = "$CP_CATEGORY" ]
+    then
+        echo "Notifying CouchPotato."
+        CP_URL="http://$CP_HOST:$CP_PORT/api/$CP_KEY"
+        CP_CMD="renamer.scan/?movie_folder=$OUTPUT_DIR"
+        wget "$CP_URL/$CP_CMD" -O /dev/null >> /dev/null &
+    fi
+
+    echo "Deleting empty directories"
+    find "$TEMP_DIR" -depth -empty | while read dir; do delete_dir "$dir"; done
 }
 
 main >> "$LOG_FILE" 2>&1
