@@ -30,7 +30,7 @@ RAR_REGEX="rar|1|01|001"
 RAR_PARTIAL="r[0-9]+|[0-9]+"
 
 function decompress_file() {
-    if [ ! ($ENABLE_DECOMPRESS -eq 1) ]; then
+    if [ ! $ENABLE_DECOMPRESS -eq 1 ]; then
         return -1
     fi
 
@@ -128,4 +128,6 @@ function main() {
     find "$TEMP_DIR" -depth -empty | while read dir; do delete_dir "$dir"; done
 }
 
+mkdir -p "$TEMP_DIR"
+touch "$LOG_FILE"
 main >> "$LOG_FILE" 2>&1
