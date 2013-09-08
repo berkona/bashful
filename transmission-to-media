@@ -15,7 +15,11 @@ CP_PORT="5050"
 CP_KEY=""
 
 # Auto decompress rar files, 1 enables, 0 disables
+# You must have unrar installed to use this feature.
 ENABLE_DECOMPRESS=1
+
+# Change this if unrar isn't on the PATH variable
+UNRAR_CMD=`which unrar`
 
 # One of "hard", "soft", and "copy"
 DOOP_STYLE="hard"
@@ -23,23 +27,22 @@ DOOP_STYLE="hard"
 SB_CATEGORY="tv-shows"
 CP_CATEGORY="movies"
 
-# Change this if unrar isn't on the PATH variable
-UNRAR_CMD=`which unrar`
-
-RAR_REGEX="rar|1|01|001"
-RAR_PARTIAL="r[0-9]+|[0-9]+"
+RAR_REGEX=".+\.(rar|[0-9]*1)"
 
 function decompress_file() {
     if [ ! $ENABLE_DECOMPRESS -eq 1 ]; then
-        return 1
+        return 2
+        # signal exception: decompress disabled
     fi
 
     if [[ $extension =~ $RAR_REGEX ]]; then
         $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
         return 0
     elif [[ $extension =~ $RAR_PARTIAL ]]; then
+        # Handled by unrar?
         return 0
     fi
+    # Signal exception: invalid file type
     return 1
 }
 
@@ -53,14 +56,13 @@ function doop_file() {
     fi
 }
 
-function process_file() {
-    echo "Processing file '$1'."
-    extension=`echo "$1"|awk -F . '{print $NF}'`
-
-    decompress_file "$1"
-
-    if [ ! $? -eq 0 ]; then
-        doop_file "$1"
+function process_files() {
+    if [$ENABLE_DECOMPRESS -eq 1 ]; then
+        find "$REAL_ROOT" -type f -regex $RAR_REGEX | while read f; do decompress_file "$f"; done
+        find "$REAL_ROOT" -type f ! -regex $RAR_REGEX | while read f; do doop_file "$f"; done
+    else
+        echo "Finding files under torrent name."
+        find "$REAL_ROOT" -type f | while read f; do doop_file "$f"; done
     fi
 }
 
@@ -106,8 +108,8 @@ function main() {
     builtin cd "$OUTPUT_DIR"
 
     # Process files into temp directory
-    echo "Finding files under torrent name."
-    find "$REAL_ROOT" -type f | while read file; do process_file "$file"; done
+    process_files
+
 
     # Send update to either SB or CP
     if [ "$CATEGORY" = "$SB_CATEGORY" ]
@@ -115,7 +117,8 @@ function main() {
         echo "Notifying SickBeard."
         SB_URL="http://$SB_HOST:$SB_PORT/home/postprocess/processEpisode"
         SB_DATA="dir=`urlencode $OUTPUT_DIR`"
-        wget --user=$SB_USER --password=$SB_PASS --post-data="$SB_DATA" "$SB_URL" -O /dev/null >> /dev/null 2>&1 &
+        WGET_FLAGS="--post-data=$SB_DATA $SB_URL -O /dev/null"
+        wget --user=$SB_USER --password=$SB_PASS $WGET_FLAGS >> /dev/null 2>&1 &
     elif [ "$CATEGORY" = "$CP_CATEGORY" ]
     then
         echo "Notifying CouchPotato."
