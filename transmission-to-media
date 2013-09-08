@@ -28,6 +28,7 @@ SB_CATEGORY="tv-shows"
 CP_CATEGORY="movies"
 
 RAR_REGEX=".+\.(rar|[0-9]*1)"
+RAR_PARTIAL=".+\.(r[0-9]+|[0-9]+)"
 
 function decompress_file() {
     $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
@@ -46,7 +47,7 @@ function doop_file() {
 function process_files() {
     if [ $ENABLE_DECOMPRESS -eq 1 ]; then
         find "$REAL_ROOT" -type f -regex $RAR_REGEX | while read f; do decompress_file "$f"; done
-        find "$REAL_ROOT" -type f ! -regex $RAR_REGEX | while read f; do doop_file "$f"; done
+        find "$REAL_ROOT" -type f ! \( -regex $RAR_REGEX  -o -regex $RAR_PARTIAL \) | while read f; do doop_file "$f"; done
     else
         echo "Finding files under torrent name."
         find "$REAL_ROOT" -type f | while read f; do doop_file "$f"; done
