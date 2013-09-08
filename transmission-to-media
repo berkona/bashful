@@ -31,10 +31,12 @@ RAR_REGEX=".+\.(rar|[0-9]*1)"
 RAR_PARTIAL=".+\.(r[0-9]+|[0-9]+)"
 
 function decompress_file() {
+    echo "Decompressing file '$1'."
     $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
 }
 
 function doop_file() {
+    echo "Duplicating file '$1'."
     if [ "$DOOP_STYLE" = "hard" ]; then
         ln "$1" "$OUTPUT_DIR"
     elif [ "$DOOP_STYLE" = "soft" ]; then
@@ -46,6 +48,7 @@ function doop_file() {
 
 function process_files() {
     if [ $ENABLE_DECOMPRESS -eq 1 ]; then
+        echo "Auto-decompressing files under the torrent. Check '$TEMP_DIR/unrar.log' for details."
         find "$REAL_ROOT" -type f -regex $RAR_REGEX | while read f; do decompress_file "$f"; done
         find "$REAL_ROOT" -type f ! \( -regex $RAR_REGEX  -o -regex $RAR_PARTIAL \) | while read f; do doop_file "$f"; done
     else
