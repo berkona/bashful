@@ -82,13 +82,15 @@ function main() {
     IFS=$OIFS
     echo "Category is '$CATEGORY'."
 
-    OUTPUT_DIR="$TEMP_DIR/$CATEGORY"
+    CATEGORY_DIR="$TEMP_DIR/$CATEGORY"
 
     builtin cd $TR_TORRENT_DIR
     if [[ ! -f $TR_TORRENT_NAME ]]
     then
         echo "Torrent is directory, creating sub-folder."
-        OUTPUT_DIR="$OUTPUT_DIR/$TR_TORRENT_NAME"
+        OUTPUT_DIR="$CATEGORY_DIR/$TR_TORRENT_NAME"
+    else
+        OUTPUT_DIR="$CATEGORY_DIR"
     fi
 
     mkdir -p "$OUTPUT_DIR"
@@ -96,7 +98,6 @@ function main() {
 
     # Process files into temp directory
     process_files
-
 
     # Send update to either SB or CP
     if [ "$CATEGORY" = "$SB_CATEGORY" ]
@@ -115,6 +116,7 @@ function main() {
     fi
 
     echo "Deleting empty directories"
+    builtin cd "$CATEGORY_DIR"
     find "$TEMP_DIR" -depth -empty | while read dir; do delete_dir "$dir"; done
 }
 
