@@ -30,20 +30,7 @@ CP_CATEGORY="movies"
 RAR_REGEX=".+\.(rar|[0-9]*1)"
 
 function decompress_file() {
-    if [ ! $ENABLE_DECOMPRESS -eq 1 ]; then
-        return 2
-        # signal exception: decompress disabled
-    fi
-
-    if [[ $extension =~ $RAR_REGEX ]]; then
-        $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
-        return 0
-    elif [[ $extension =~ $RAR_PARTIAL ]]; then
-        # Handled by unrar?
-        return 0
-    fi
-    # Signal exception: invalid file type
-    return 1
+    $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
 }
 
 function doop_file() {
