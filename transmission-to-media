@@ -120,8 +120,7 @@ function main() {
     fi
 
     echo "Deleting empty directories"
-    builtin cd "$CATEGORY_DIR"
-    find "$CATEGORY_DIR" -depth -type d -empty | while read dir; do delete_dir "$dir"; done
+    find "$TEMP_DIR" -mindepth 2 -depth -type d -empty | while read dir; do delete_dir "$dir"; done
 }
 
 mkdir -p "$TEMP_DIR"
