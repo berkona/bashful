@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set to what directory you want to temporarily keep files
-TEMP_DIR=/mnt/tmp
+TEMP_DIR="/mnt/tmp"
 LOG_FILE="$TEMP_DIR/postprocessing.log"
 
 # Set up for SickBeard & CouchPotato
@@ -22,7 +22,7 @@ ENABLE_DECOMPRESS=1
 UNRAR_CMD=`which unrar`
 
 # One of "hard", "soft", and "copy"
-DOOP_STYLE="hard"
+DOOP_STYLE="copy"
 
 SB_CATEGORY="tv-shows"
 CP_CATEGORY="movies"
@@ -39,9 +39,17 @@ function doop_file() {
     echo "Duplicating file '$1'."
     if [ "$DOOP_STYLE" = "hard" ]; then
         ln "$1" "$OUTPUT_DIR"
+        retval=$?
     elif [ "$DOOP_STYLE" = "soft" ]; then
         ln -s "$1" "$OUTPUT_DIR"
+        retval=$?
     else
+        cp "$1" "$OUTPUT_DIR" &
+        retval=0
+    fi
+
+    if [ $retval -ne 0 ]; then
+        echo "$DOOP_STYLE failed.  Retrying with default (copy)."
         cp "$1" "$OUTPUT_DIR" &
     fi
 }
