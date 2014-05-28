@@ -2,18 +2,31 @@
 
 # Change if you don't want to install to /usr/local/bin
 INSTALL_DIR="/usr/local/bin"
+CONF_DIR="/usr/local/etc"
 
 # You shouldn't have to change this, unless the scripts are not where the install file is
 WORKING_DIR=`pwd`
 
-for file in $(find * ! -iname "install")
+for file in $(find * ! -iname "install" ! -iname "*.sample")
 do
-	if [ -f "$INSTALL_DIR/$1" ]
+	if [ -f "$INSTALL_DIR/$file" ]
 	then
-		echo "Removing old symlink at $INSTALL_DIR/$1"
-		rm "$INSTALL_DIR/$1"
+		echo "Removing old symlink at $INSTALL_DIR/$file"
+		rm "$INSTALL_DIR/$file"
 	fi
 
-	echo "Symlinking $WORKING_DIR/$file  to $INSTALL_DIR/$1"
-	ln -s "$WORKING_DIR/$file" "$INSTALL_DIR/$1"
+	echo "Symlinking $WORKING_DIR/$file to $INSTALL_DIR/$file"
+	ln -s "$WORKING_DIR/$file" "$INSTALL_DIR/$file"
+done
+
+for file in $(find * -iname "*.conf")
+do
+	if [ -f "$CONF_DIR/$file" ]
+	then
+		echo "Removing old file at $CONF_DIR/$file"
+		rm "$CONF_DIR/$file"
+	fi
+
+	echo "Copying $WORKING_DIR/$file to $CONF_DIR/$file"
+	cp "$WORKING_DIR/$file" "$CONF_DIR/$file"
 done

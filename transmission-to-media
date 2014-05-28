@@ -1,38 +1,12 @@
 #!/usr/bin/env bash
 
-# Set to what directory you want to temporarily keep files
-TEMP_DIR="/mnt/tmp"
-LOG_FILE="$TEMP_DIR/postprocessing.log"
+CONF_DIR="/usr/local/etc"
 
-# Set up for SickBeard & CouchPotato
-SB_HOST="localhost"
-SB_PORT="8081"
-SB_USER=""
-SB_PASS=""
-
-CP_HOST="localhost"
-CP_PORT="5050"
-CP_KEY=""
-
-# Auto decompress rar files, 1 enables, 0 disables
-# You must have unrar installed to use this feature.
-ENABLE_DECOMPRESS=1
-
-# Change this if unrar isn't on the PATH variable
-UNRAR_CMD=`which unrar`
-
-# One of "hard", "soft", and "copy"
-DOOP_STYLE="copy"
-
-SB_CATEGORY="tv-shows"
-CP_CATEGORY="movies"
-
-RAR_REGEX=".*\.(rar|1|01|001)"
-RAR_PARTIAL=".*\.(r[0-9]+|[0-9]+)"
+source "$CONF_DIR/postprocess.conf"
 
 function decompress_file() {
     echo "Decompressing file '$1'."
-    $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log" &
+    $UNRAR_CMD x -o+ -y -ad -idp "$1" >> "$TEMP_DIR/unrar.log"
 }
 
 function doop_file() {
@@ -44,24 +18,13 @@ function doop_file() {
         ln -s "$1" "$OUTPUT_DIR"
         retval=$?
     else
-        cp "$1" "$OUTPUT_DIR" &
+        cp "$1" "$OUTPUT_DIR"
         retval=0
     fi
 
     if [ $retval -ne 0 ]; then
         echo "$DOOP_STYLE failed.  Retrying with default (copy)."
-        cp "$1" "$OUTPUT_DIR" &
-    fi
-}
-
-function process_files() {
-    if [ $ENABLE_DECOMPRESS -eq 1 ]; then
-        echo "Auto-decompressing files under the torrent. Check '$TEMP_DIR/unrar.log' for details."
-        find -E "$REAL_ROOT" -type f -regex $RAR_REGEX | while read f; do decompress_file "$f"; done
-        find -E "$REAL_ROOT" -type f ! \( -regex $RAR_REGEX  -o -regex $RAR_PARTIAL \) | while read f; do doop_file "$f"; done
-    else
-        echo "Finding files under torrent name."
-        find "$REAL_ROOT" -type f | while read f; do doop_file "$f"; done
+        cp "$1" "$OUTPUT_DIR"
     fi
 }
 
@@ -109,7 +72,14 @@ function main() {
     builtin cd "$OUTPUT_DIR"
 
     # Process files into temp directory
-    process_files
+    if [ $ENABLE_DECOMPRESS -eq 1 ]; then
+        echo "Auto-decompressing files under the torrent. Check '$TEMP_DIR/unrar.log' for details."
+        find -E "$REAL_ROOT" -type f -regex $RAR_REGEX | while read f; do decompress_file "$f"; done
+        find -E "$REAL_ROOT" -type f ! \( -regex $RAR_REGEX  -o -regex $RAR_PARTIAL \) | while read f; do doop_file "$f"; done
+    else
+        echo "Finding files under torrent name."
+        find "$REAL_ROOT" -type f | while read f; do doop_file "$f"; done
+    fi
 
     # Send update to either SB or CP
     if [ "$CATEGORY" = "$SB_CATEGORY" ]
