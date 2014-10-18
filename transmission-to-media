@@ -97,8 +97,8 @@ function main() {
         wget "$CP_URL/$CP_CMD" -O /dev/null >> /dev/null 2>&1 &
     fi
 
-    echo "Deleting empty directories"
-    find "$TEMP_DIR" -mindepth 2 -depth -type d -empty | while read dir; do delete_dir "$dir"; done
+    # echo "Deleting empty directories"
+    # find "$TEMP_DIR" -mindepth 2 -depth -type d -empty | while read dir; do delete_dir "$dir"; done
 }
 
 mkdir -p "$TEMP_DIR"
